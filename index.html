@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!-- xlsx.js (C) 2013-present  SheetJS http://sheetjs.com -->
+<!-- vim: set ts=2: -->
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Security-Policy" content="script-src 'self' https:">
+	<title>SheetJS Electron Demo</title>
+	<style>
+		#drop {
+			border: 2px dashed #bbb;
+			border-radius: 5px;
+			padding: 25px;
+			text-align: center;
+			font: 20pt bold, "Vollkorn";
+			color: #bbb;
+			cursor: pointer;
+		}
+
+		a {
+			text-decoration: none
+		}
+	</style>
+</head>
+
+<body>
+	<h1>SheetJS Electron Demo</h1>
+
+	<div id="drop">Drop a spreadsheet file or click here to see sheet data</div>
+	<input type="file" id="readIn" multiple webkitdirectory directory style="display: none;" />
+
+	<p>
+		<button id="exportBtn">Export</button>
+	</p>
+	<script src="index-xlsx.js"></script>
+</body>
+
+</html>
