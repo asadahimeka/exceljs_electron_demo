@@ -6,9 +6,9 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="Content-Security-Policy" content="script-src 'self' https:">
-	<title>SheetJS Electron Demo</title>
+	<title>ExcelJS Electron Demo</title>
 	<style>
-		#drop {
+		#selfolder {
 			border: 2px dashed #bbb;
 			border-radius: 5px;
 			padding: 25px;
@@ -25,15 +25,14 @@
 </head>
 
 <body>
-	<h1>SheetJS Electron Demo</h1>
+	<h1>ExcelJS Electron Demo</h1>
 
-	<div id="drop">Drop a spreadsheet file or click here to see sheet data</div>
-	<input type="file" id="readIn" multiple webkitdirectory directory style="display: none;" />
+	<div id="selfolder">Click here</div>
 
 	<p>
 		<button id="exportBtn">Export</button>
 	</p>
-	<script src="index-xlsx.js"></script>
+	<script src="index-excel.js"></script>
 </body>
 
 </html>

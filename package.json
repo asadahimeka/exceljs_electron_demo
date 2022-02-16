@@ -1,18 +1,37 @@
 {
-	"name": "sheetjs-electron",
+	"name": "exceljs-electron",
 	"version": "0.0.1",
-	"author": "sheetjs",
-	"description": "SheetJS Electron Demo",
+	"author": "asadahimeka",
+	"description": "ExcelJS Electron Demo",
 	"license": "MIT",
 	"main": "main.js",
-	"dependencies": {
-		"electron": "^17.0.0",
-		"exceljs": "^4.3.0",
-		"sheetjs-style": "^0.15.8",
-		"xlsx": "^0.18.0",
-		"xlsx-style": "^0.8.13"
-	},
 	"scripts": {
-		"start": "electron ."
+		"start": "electron .",
+		"app:dir": "rimraf dist && electron-builder --dir",
+		"app:dist": "electron-builder",
+		"postinstall": "electron-builder install-app-deps"
+	},
+	"build": {
+    "appId": "me.asadahimeka.exceljs-electron",
+		"asar": false,
+    "files": [
+			"./index.html",
+			"./main.js",
+			"./index-excel.js",
+			"./convert-xls-xlsx.vbs",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "resources"
+    },
+    "publish": null
+  },
+	"dependencies": {
+		"exceljs": "^4.3.0",
+		"lodash.clonedeep": "^4.5.0"
+	},
+	"devDependencies": {
+		"electron": "^17.0.0",
+		"electron-builder": "^22.14.13"
 	}
 }

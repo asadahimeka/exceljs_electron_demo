@@ -1,20 +1,15 @@
+const fs = require('fs');
+const { join } = require('path');
+const { execSync } = require('child_process');
 const { ipcRenderer } = require('electron');
 const Excel = require('exceljs');
-const _ = require('lodash');
-
-const readIn = document.getElementById('readIn');
-const exportBtn = document.getElementById('exportBtn');
-const drop = document.getElementById('drop');
+const cloneDeep = require('lodash.clonedeep');
 
 /** @type {Record<string, Excel.Workbook>} */
 let results = {};
-
-ipcRenderer.on('selected-directory', (_event, path) => {
-  console.log('path: ', path);
-});
+let selFolderPath = '';
 
 const processWb = (/** @type {Excel.Workbook} */ wb, fileName) => {
-  console.log('wb: ', wb);
   wb.eachSheet(sheet => {
     const sheetName = sheet.name;
     if (!results[sheetName]) {
@@ -22,56 +17,59 @@ const processWb = (/** @type {Excel.Workbook} */ wb, fileName) => {
     }
     const res = results[sheetName];
     const copySheet = res.addWorksheet(fileName);
-    copySheet.model = _.cloneDeep(sheet.model);
+    copySheet.model = cloneDeep(sheet.model);
     copySheet.name = fileName;
   });
 };
 
-const readFile = file => {
-  const fileName = file.name.split('.')[0];
+const readFile = (filePath, fileName) => {
   const workbook = new Excel.Workbook();
-  workbook.xlsx.readFile(file.path).then(wb => {
+  workbook.xlsx.readFile(filePath).then(wb => {
     processWb(wb, fileName);
   });
 };
 
-const readFiles = files => {
-  console.log('files: ', files);
-  for (let i = 0; i < files.length; i++) {
-    readFile(files[i]);
-  }
-};
-
 const exportXlsx = () => {
-  console.log('results: ', results);
+  const outPath = join(selFolderPath, '_out');
+  if (!fs.existsSync(outPath)) fs.mkdirSync(outPath);
   Object.keys(results).forEach(key => {
-    results[key].xlsx.writeFile(`./out/${key}.xlsx`, {
+    results[key].xlsx.writeFile(join(outPath, `${key}.xlsx`), {
       useSharedStrings: true,
       useStyles: true
     });
   });
   results = {};
-  readIn.value = null;
+  try {
+    execSync('start ' + outPath);
+  } catch (err) {
+    console.log('err: ', err);
+  }
 };
 
-readIn.addEventListener('change', e => { readFiles(e.target.files); }, false);
+const selFolderBtn = document.getElementById('selfolder');
+const exportBtn = document.getElementById('exportBtn');
+
+ipcRenderer.on('selected-directory', (_event, path) => {
+  try {
+    selFolderPath = path;
+    if (process.env.npm_lifecycle_event) {
+      execSync('convert-xls-xlsx.vbs ' + path);
+    } else {
+      execSync(join(process.resourcesPath, 'app', 'convert-xls-xlsx.vbs') + ' ' + path);
+    }
+    const files = fs.readdirSync(path);
+    for (const filePath of files) {
+      if (filePath.endsWith('.xlsx')) {
+        readFile(join(path, filePath), filePath.split('.')[0]);
+      }
+    }
+  } catch (error) {
+    console.log('error: ', error);
+    alert('运行出错：' + error);
+  }
+});
+
 exportBtn.addEventListener('click', exportXlsx, false);
-drop.addEventListener('click', () => {
-  // readIn.click();
+selFolderBtn.addEventListener('click', () => {
   ipcRenderer.send('open-file-dialog');
 });
-drop.addEventListener('dragenter', e => {
-  e.stopPropagation();
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'copy';
-}, false);
-drop.addEventListener('dragover', e => {
-  e.stopPropagation();
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'copy';
-}, false);
-drop.addEventListener('drop', e => {
-  e.stopPropagation();
-  e.preventDefault();
-  readFiles(e.dataTransfer.files);
-}, false);

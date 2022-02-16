@@ -16,4 +16,3 @@ For Each objFile In objFolder.Files
         objExcel.Application.DisplayAlerts =  True
     End If
 Next
-MsgBox "Finished conversion"
