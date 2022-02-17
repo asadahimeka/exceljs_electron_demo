@@ -1,13 +1,13 @@
 const fs = require('fs');
 const { join } = require('path');
 const { execSync } = require('child_process');
-const { ipcRenderer } = require('electron');
 const Excel = require('exceljs');
 const cloneDeep = require('lodash.clonedeep');
 
 /** @type {Record<string, Excel.Workbook>} */
 let results = {};
-let selFolderPath = '';
+let selFolderPath = process.argv;
+console.log('selFolderPath: ', selFolderPath);
 
 const processWb = (/** @type {Excel.Workbook} */ wb, fileName) => {
   wb.eachSheet(sheet => {
@@ -39,37 +39,22 @@ const exportXlsx = () => {
     });
   });
   results = {};
+  execSync('start ' + outPath);
+};
+
+const main = () => {
   try {
-    execSync('start ' + outPath);
-  } catch (err) {
-    console.log('err: ', err);
+    execSync('convert-xls-xlsx.vbs ' + selFolderPath);
+    const files = fs.readdirSync(selFolderPath);
+    for (const filePath of files) {
+      if (filePath.endsWith('.xlsx')) {
+        readFile(join(selFolderPath, filePath), filePath.split('.')[0]);
+      }
+    }
+    exportXlsx();
+  } catch (error) {
+    console.log('error: ', error);
   }
 };
 
-const selFolderBtn = document.getElementById('selfolder');
-const exportBtn = document.getElementById('exportBtn');
-
-ipcRenderer.on('selected-directory', (_event, path) => {
-  try {
-    selFolderPath = path;
-    if (process.env.npm_lifecycle_event) {
-      execSync('convert-xls-xlsx.vbs ' + path);
-    } else {
-      execSync(join(process.resourcesPath, 'app', 'convert-xls-xlsx.vbs') + ' ' + path);
-    }
-    const files = fs.readdirSync(path);
-    for (const filePath of files) {
-      if (filePath.endsWith('.xlsx')) {
-        readFile(join(path, filePath), filePath.split('.')[0]);
-      }
-    }
-  } catch (error) {
-    console.log('error: ', error);
-    alert('运行出错：' + error);
-  }
-});
-
-exportBtn.addEventListener('click', exportXlsx, false);
-selFolderBtn.addEventListener('click', () => {
-  ipcRenderer.send('open-file-dialog');
-});
+main();

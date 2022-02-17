@@ -6,32 +6,16 @@
 	"license": "MIT",
 	"main": "main.js",
 	"scripts": {
-		"start": "electron .",
-		"app:dir": "rimraf dist && electron-builder --dir",
-		"app:dist": "electron-builder",
-		"postinstall": "electron-builder install-app-deps"
+		"start": "node index.js",
+		"build": "pkg -t win-x64 -C GZip index.js"
 	},
-	"build": {
-    "appId": "me.asadahimeka.exceljs-electron",
-		"asar": false,
-    "files": [
-			"./index.html",
-			"./main.js",
-			"./index-excel.js",
-			"./convert-xls-xlsx.vbs",
-      "package.json"
-    ],
-    "directories": {
-      "buildResources": "resources"
-    },
-    "publish": null
-  },
 	"dependencies": {
 		"exceljs": "^4.3.0",
 		"lodash.clonedeep": "^4.5.0"
 	},
 	"devDependencies": {
 		"electron": "^17.0.0",
-		"electron-builder": "^22.14.13"
+		"electron-builder": "^22.14.13",
+		"pkg": "^5.5.2"
 	}
 }
