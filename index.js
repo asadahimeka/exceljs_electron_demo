@@ -6,7 +6,7 @@ const cloneDeep = require('lodash.clonedeep');
 
 /** @type {Record<string, Excel.Workbook>} */
 let results = {};
-let selFolderPath = process.argv;
+let selFolderPath = process.argv[2];
 console.log('selFolderPath: ', selFolderPath);
 
 const processWb = (/** @type {Excel.Workbook} */ wb, fileName) => {
